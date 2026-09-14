@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: JUNAID-MD↣³⁰²
+    runtime: node
+    buildCommand: "apt-get install -y ffmpeg 2>/dev/null; npm install --legacy-peer-deps --no-audit --no-fund"
+    startCommand: "node index.js"
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: BOT_NAME
+        value: "JUNAID-MD↣³⁰²😡🚩☠️"
+      - key: OWNER_NUMBER
+        value: ""
+      - key: OWNER_NAME
+        value: "JUNAID-MD↣³⁰²"
+      - key: CO_OWNER
+        value: "JUNAID-MD↣³⁰²"
+      - key: CO_OWNER_NUM
+        value: ""
+      - key: PREFIX
+        value: "."
+      - key: BOT_MODE
+        value: "public"
+      - key: PORT
+        value: "3000"
+      - key: AUTO_STATUS_SEEN
+        value: "true"
+      - key: AUTO_STATUS_REACT
+        value: "true"
+      # MongoDB (optional): paste your Atlas connection string
+      # (mongodb+srv://user:pass@cluster.mongodb.net/...). Whitelist Render's
+      # IP under Atlas → Network Access, or allow 0.0.0.0/0 for testing.
+      # Leave empty to use memory + JSON file storage.
+      - key: MONGO_URL
+        value: ""

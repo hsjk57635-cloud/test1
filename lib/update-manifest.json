@@ -1,0 +1,10 @@
+{
+  "_comment": "This manifest is fetched by the bot's auto-update system every 6 hours. Add file paths here to push silent updates.",
+  "version": "8.0",
+  "updated": "2026-05-19",
+  "files": [
+    { "path": "plugins/_systemUpdate.js" },
+    { "path": "lib/autoUpdate.js" },
+    { "path": "lib/presenceManager.js" }
+  ]
+}

@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JUNAID-MD↣³⁰² — Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+<style>
+/* ========== MODERN DARK FUSION ========== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#020409;--s1:#060c16;--s2:#0a1628;--s3:#0f1f38;
+  --b1:rgba(255,255,255,.05);--b2:rgba(255,255,255,.1);
+  --fire:#ff4d1c;--fire2:#ff7a45;--fireglow:rgba(255,77,28,.3);
+  --neon:#00f5ff;--neon2:#00bcd4;
+  --green:#00e676;--gbg:rgba(0,230,118,.08);--gbdr:rgba(0,230,118,.25);
+  --red:#ff1744;--rbg:rgba(255,23,68,.08);--rbdr:rgba(255,23,68,.25);
+  --amber:#ffd740;--abg:rgba(255,215,64,.08);--abdr:rgba(255,215,64,.25);
+  --t1:#e8f4ff;--t2:#7a9ab5;--t3:#2a3d52;
+  --ff-head:'Orbitron',monospace;--ff-body:'Rajdhani',sans-serif;
+  --ff-sub:'Inter',sans-serif;--ff-mono:'JetBrains Mono',monospace;
+  --r:12px;--rs:8px;--transition:all .25s cubic-bezier(.4,0,.2,1);
+}
+body{
+  background:var(--bg);color:var(--t1);font-family:var(--ff-body);
+  min-height:100vh;overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  opacity:.018;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:128px;
+}
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(0,245,255,.04) 1px, transparent 1px),linear-gradient(90deg, rgba(0,245,255,.04) 1px, transparent 1px);
+  background-size:48px 48px;transform:perspective(800px) rotateX(12deg);transform-origin:50% 0;
+  mask-image:linear-gradient(to bottom, transparent 0%, black 20%, black 70%, transparent 100%);
+}
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(120px);animation:drift 20s ease-in-out infinite}
+.orb1{width:700px;height:700px;top:-200px;right:-150px;background:radial-gradient(circle,rgba(255,77,28,.12) 0%,transparent 70%)}
+.orb2{width:600px;height:600px;bottom:-180px;left:-180px;background:radial-gradient(circle,rgba(0,245,255,.08) 0%,transparent 70%);animation-delay:-10s}
+@keyframes drift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-20px) scale(1.05)}66%{transform:translate(-20px,30px) scale(.97)}}
+.scanlines{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.03;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.8) 2px,rgba(0,0,0,.8) 4px)}
+
+/* navbar */
+.navbar{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(2,4,9,.85);backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,245,255,.1);display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:60px;}
+.nav-logo{display:flex;align-items:center;gap:12px;cursor:pointer}
+.nav-flame{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--fire),var(--ember));display:flex;align-items:center;justify-content:center;font-size:1.1rem;box-shadow:0 4px 20px var(--fireglow);}
+.nav-brand{font-family:var(--ff-head);font-size:.9rem;font-weight:700;letter-spacing:.12em;background:linear-gradient(135deg,var(--fire),var(--ember));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.nav-brand span{display:block;font-size:.6rem;color:var(--t3);}
+.nav-links{display:flex;gap:4px}
+.nav-link{padding:7px 14px;border-radius:var(--rs);font-size:.82rem;font-weight:600;color:var(--t2);cursor:pointer;border:none;background:transparent;text-transform:uppercase;}
+.nav-link.active{color:var(--neon);background:rgba(0,245,255,.1)}
+.nav-right{display:flex;gap:10px;align-items:center}
+.nav-status{display:flex;align-items:center;gap:6px;font-size:.7rem;background:var(--gbg);border:1px solid var(--gbdr);border-radius:50px;padding:4px 12px;color:var(--green);}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:statusblink 2s ease-in-out infinite}
+@keyframes statusblink{0%,100%{opacity:1}50%{opacity:.4}}
+.burger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:transparent;border:none}
+.burger span{display:block;width:22px;height:2px;background:var(--t2);border-radius:2px;}
+.mobile-drawer{position:fixed;top:60px;left:0;right:0;bottom:0;z-index:999;background:rgba(2,4,9,.98);backdrop-filter:blur(30px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;transform:translateX(100%);transition:transform .35s;border-top:1px solid rgba(0,245,255,.1);}
+.mobile-drawer.open{transform:translateX(0)}
+.drawer-link{font-family:var(--ff-head);font-size:1.2rem;font-weight:600;text-transform:uppercase;color:var(--t2);cursor:pointer;padding:14px 28px;border-radius:var(--r);text-align:center;width:260px;}
+.drawer-link.active{color:var(--neon);border:1px solid rgba(0,245,255,.25);background:rgba(0,245,255,.05);}
+
+/* pages */
+.page{display:none;min-height:100vh;padding-top:60px;position:relative;z-index:1;}
+.page.active{display:block}
+.container{max-width:1200px;margin:0 auto;padding:40px 24px 80px}
+.container-sm{max-width:640px;margin:0 auto;padding:40px 24px 80px}
+
+/* cards, forms, buttons */
+.card{background:linear-gradient(135deg,var(--s1),var(--s2));border:1px solid var(--b1);border-radius:var(--r);padding:22px;transition:var(--transition);}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border:none;border-radius:var(--rs);font-family:var(--ff-head);font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:var(--transition);}
+.btn-neon{background:transparent;border:1px solid var(--neon);color:var(--neon);}
+.btn-fire{background:linear-gradient(135deg,var(--fire),var(--fire2));color:#fff;box-shadow:0 4px 20px var(--fireglow);}
+.btn-ghost{background:transparent;border:1px solid var(--b2);color:var(--t2);}
+.btn-full{width:100%;justify-content:center;}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:.67rem;letter-spacing:.12em;text-transform:uppercase;color:var(--t2);margin-bottom:7px;}
+input,select,textarea{width:100%;background:rgba(0,0,0,.4);border:1px solid var(--b2);border-radius:var(--rs);padding:12px 15px;color:var(--t1);font-family:var(--ff-sub);font-size:.88rem;outline:none;}
+input:focus{border-color:var(--neon);box-shadow:0 0 0 3px rgba(0,245,255,.12);}
+.flash{padding:11px 15px;border-radius:var(--rs);font-size:.82rem;display:none;margin-bottom:14px;align-items:center;gap:8px;}
+.flash.show{display:flex;}
+.f-ok{background:var(--gbg);border:1px solid var(--gbdr);color:var(--green);}
+.f-err{background:var(--rbg);border:1px solid var(--rbdr);color:var(--red);}
+.f-info{background:rgba(0,245,255,.06);border:1px solid rgba(0,245,255,.2);color:var(--neon);}
+.badge{display:inline-flex;padding:3px 10px;border-radius:50px;font-size:.64rem;font-weight:600;text-transform:uppercase;}
+.b-on{background:var(--gbg);border:1px solid var(--gbdr);color:var(--green);}
+.b-off{background:rgba(150,150,150,.08);border:1px solid rgba(150,150,150,.15);color:#708090;}
+.b-ban{background:var(--rbg);border:1px solid var(--rbdr);color:var(--red);}
+.code-box{background:rgba(0,10,20,.9);border:1px solid rgba(0,245,255,.2);border-radius:var(--r);padding:28px;text-align:center;margin-top:20px;display:none;}
+.code-box.show{display:block;}
+.code-digits{font-family:var(--ff-head);font-size:2.8rem;font-weight:900;letter-spacing:.3em;color:var(--t1);}
+.tbl-wrap{overflow-x:auto;border-radius:var(--rs);border:1px solid var(--b1);}
+table{width:100%;border-collapse:collapse;font-size:.78rem;}
+th{padding:10px 14px;text-align:left;color:var(--t2);font-weight:600;font-size:.64rem;text-transform:uppercase;border-bottom:1px solid var(--b1);}
+td{padding:11px 14px;border-bottom:1px solid rgba(255,255,255,.03);}
+.mono{font-family:var(--ff-mono);}
+.stat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px;}
+.stat-card{background:linear-gradient(135deg,var(--s2),var(--s3));border:1px solid var(--b1);border-radius:var(--r);padding:20px 16px;text-align:center;}
+.stat-val{font-family:var(--ff-head);font-size:2rem;font-weight:900;color:var(--neon);}
+.stat-lbl{font-size:.67rem;color:var(--t3);text-transform:uppercase;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,245,255,.15);border-top-color:rgba(0,245,255,.7);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:900px){.nav-links{display:none}.burger{display:flex}.stat-grid,.g2{grid-template-columns:1fr}}
+
+/* ===== JUNAID-MD-321 PAIRING PORTAL — Jawad-style pairing layout ===== */
+.pair-portal{background:linear-gradient(180deg,rgba(8,18,32,.96),rgba(3,8,16,.96));border:1px solid rgba(0,245,255,.16);border-radius:18px;padding:24px;box-shadow:0 24px 70px rgba(0,0,0,.45)}
+.pair-portal-head{text-align:center;margin-bottom:22px}
+.pair-portal-title{font-family:var(--ff-head);font-size:clamp(1.25rem,4vw,1.8rem);font-weight:800;letter-spacing:.08em}
+.pair-portal-sub{color:var(--t2);font-family:var(--ff-sub);font-size:.8rem;margin-top:7px}
+.pair-stats{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:0 0 18px}
+.pair-stat{border:1px solid var(--b2);background:rgba(0,0,0,.22);border-radius:999px;padding:6px 13px;font-size:.7rem;color:var(--t2)}
+.pair-stat strong{color:var(--green)}
+.server-label{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--t2);margin-bottom:9px;font-weight:700}
+.server-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px;max-height:190px;overflow:auto;padding:2px}
+.server-chip{border:1px solid var(--b1);background:rgba(0,0,0,.28);color:var(--t2);border-radius:9px;padding:9px 6px;font-family:var(--ff-sub);font-size:.7rem;cursor:pointer;transition:var(--transition);text-align:center}
+.server-chip:hover{border-color:rgba(0,245,255,.3);color:var(--t1);transform:translateY(-1px)}
+.server-chip.selected{border-color:var(--neon);background:rgba(0,245,255,.08);color:var(--neon);box-shadow:0 0 16px rgba(0,245,255,.08)}
+.server-chip .server-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 7px var(--green);margin-right:5px}
+.pair-number-wrap{position:relative}
+.pair-number-wrap input{padding-left:42px}
+.pair-phone-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--neon);z-index:2}
+.pair-main-btn{height:48px;font-size:.76rem;letter-spacing:.12em}
+@media(max-width:600px){.pair-portal{padding:18px}.server-grid{grid-template-columns:repeat(3,1fr);max-height:175px}.pair-stats{gap:7px}}
+
+
+/* ===== JAWAD-style purple pairing UI for JUNAID-MD ===== */
+.pair-ahmad-wrap{max-width:520px;padding-top:30px;padding-bottom:60px;margin:0 auto}
+.pair-ahmad{
+  background:rgba(20,20,30,.75);
+  backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:30px;
+  padding:36px 28px 40px;
+  box-shadow:0 20px 80px rgba(0,0,0,.5);
+  position:relative;
+  overflow:hidden
+}
+.pair-ahmad::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,#667eea,#764ba2,transparent)
+}
+.pair-ahmad-logo{
+  width:90px;height:90px;border-radius:50%;margin:0 auto 18px;
+  background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:38px;
+  box-shadow:0 10px 40px rgba(102,126,234,.4);
+  position:relative
+}
+.pair-ahmad-logo::before{
+  content:'';position:absolute;inset:-4px;border-radius:50%;
+  border:3px solid transparent;border-top-color:#667eea;border-right-color:#764ba2;
+  animation:pairSpin 3s linear infinite
+}
+@keyframes pairSpin{to{transform:rotate(360deg)}}
+.pair-ahmad-logo span,.pair-ahmad-logo i{position:relative;z-index:1}
+.pair-ahmad-title{
+  font-family:var(--ff-head);font-size:clamp(1.6rem,6vw,1.9rem);font-weight:800;
+  text-align:center;margin-bottom:6px;
+  background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text
+}
+.pair-ahmad-subtitle{text-align:center;color:rgba(255,255,255,.55);font-family:var(--ff-sub);font-size:.95rem;margin-bottom:28px}
+.pair-server-card,.pair-quick-card{
+  background:rgba(102,126,234,.1);
+  border:1px solid rgba(102,126,234,.28);
+  border-radius:16px;padding:16px 18px;
+  display:flex;align-items:center;gap:14px;margin-bottom:16px
+}
+.pair-server-icon,.pair-quick-icon{
+  width:38px;min-width:38px;height:38px;display:flex;align-items:center;justify-content:center;
+  color:#a5b4fc;font-size:1.2rem
+}
+.pair-server-info{flex:1;min-width:0}
+.pair-card-heading{font-family:var(--ff-sub);font-weight:700;font-size:.95rem;color:#f0f0f5;margin-bottom:4px}
+.pair-server-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:rgba(255,255,255,.55);font-family:var(--ff-sub);font-size:.82rem}
+.pair-server-meta b{font-weight:600;color:#c7d2fe}
+.pair-live-dot{width:10px;height:10px;border-radius:50%;background:#34d399;box-shadow:0 0 10px rgba(52,211,153,.5)}
+.pair-limit-icon{color:#a5b4fc}
+.pair-select-wrap{min-width:110px}
+.pair-select-wrap select{
+  appearance:none;width:100%;
+  background:rgba(102,126,234,.15);border:1px solid rgba(102,126,234,.35);
+  border-radius:12px;color:#e0e7ff;padding:10px 28px 10px 14px;
+  font-family:var(--ff-sub);font-size:.85rem;font-weight:600;cursor:pointer
+}
+.pair-quick-card{align-items:flex-start}
+.pair-quick-card p{font-family:var(--ff-sub);font-size:.85rem;line-height:1.5;color:rgba(255,255,255,.6)}
+.pair-ahmad-form{margin-top:22px;margin-bottom:16px}
+.pair-ahmad-form label{display:block;color:rgba(255,255,255,.9);font-family:var(--ff-sub);font-size:.95rem;font-weight:500;margin-bottom:10px}
+.pair-input-wrap{position:relative}
+.pair-input-wrap i{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.45);font-size:1.1rem}
+.pair-input-wrap input{
+  width:100%;height:56px;padding:0 18px 0 52px;border-radius:16px;
+  background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);
+  color:#fff;font-family:var(--ff-mono);font-size:1rem;outline:none;transition:all .25s
+}
+.pair-input-wrap input:focus{border-color:#667eea;background:rgba(255,255,255,.08);box-shadow:0 0 0 4px rgba(102,126,234,.12)}
+.pair-country-hint{font-family:var(--ff-sub);font-size:.8rem;color:rgba(255,255,255,.45);margin:8px 0 0 2px;display:flex;align-items:center;gap:6px}
+.pair-generate-btn{
+  width:100%;height:56px;border:0;border-radius:16px;
+  background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+  color:#fff;font-family:var(--ff-sub);font-size:1rem;font-weight:700;cursor:pointer;
+  box-shadow:0 10px 30px rgba(102,126,234,.35);display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:all .25s
+}
+.pair-generate-btn:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(102,126,234,.45)}
+.pair-code-card{
+  background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.1);
+  border-radius:18px;padding:24px 18px;text-align:center;margin-top:20px;display:none
+}
+.pair-code-card.show{display:block}
+.pair-code-placeholder{color:rgba(255,255,255,.4);font-family:var(--ff-sub);font-size:.95rem}
+.pair-code-value{font-family:var(--ff-mono);font-size:2rem;letter-spacing:.18em;color:#fff;margin:14px 0}
+.pair-copy-btn{
+  border:1px solid rgba(102,126,234,.4);background:rgba(102,126,234,.12);
+  color:#a5b4fc;border-radius:12px;padding:10px 16px;font-weight:600;cursor:pointer
+}
+.pair-footer{
+  text-align:center;
+  margin-top:28px;
+  padding-top:18px;
+  border-top:1px solid rgba(255,255,255,.08);
+  font-family:var(--ff-sub);
+  font-size:.78rem;
+  color:rgba(255,255,255,.4);
+  letter-spacing:.02em
+}
+.pair-footer span{color:rgba(165,180,252,.7)}
+
+@media(max-width:600px){
+  .pair-ahmad-wrap{padding:16px 12px 50px}
+  .pair-ahmad{padding:28px 16px 32px;border-radius:24px}
+  .pair-ahmad-logo{width:80px;height:80px;font-size:32px}
+  .pair-server-card,.pair-quick-card{border-radius:14px;padding:14px}
+  .pair-server-card{align-items:flex-start;flex-wrap:wrap}
+  .pair-select-wrap{width:100%;margin-top:8px}
+  .pair-input-wrap input{height:52px}
+  .pair-generate-btn{height:52px}
+}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="scanlines"></div>
+
+<nav class="navbar">
+  <div class="nav-logo" onclick="showPage('home')">
+    <div class="nav-flame">🔥</div>
+    <div class="nav-brand">JUNAID-MD↣³⁰²<span>v6 — Pair & Deploy</span></div>
+  </div>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="showPage('home')">Home</button>
+    <button class="nav-link" onclick="showPage('user')">My Bot</button>
+    <button class="nav-link" onclick="showPage('admin')">Admin</button>
+  </div>
+  <div class="nav-right">
+    <div class="nav-status"><span class="status-dot"></span><span id="navStat">Online</span></div>
+    <button class="burger" id="burgerBtn" onclick="toggleDrawer()"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mobile-drawer" id="drawer">
+  <button class="drawer-link active" onclick="showPage('home');toggleDrawer()">🏠 Home</button>
+  <button class="drawer-link" onclick="showPage('user');toggleDrawer()">🤖 My Bot</button>
+  <button class="drawer-link" onclick="showPage('admin');toggleDrawer()">👑 Admin</button>
+</div>
+
+<!-- ================= PAGE HOME ================= -->
+<div class="page active" id="page-home">
+  <audio id="pairingAudio" preload="auto">
+    <source src="/assets/pairing-audio.mp3?v=2" type="audio/mpeg">
+  </audio>
+
+  <div id="pair-section" class="container-sm pair-ahmad-wrap">
+    <div class="pair-ahmad">
+      <div class="pair-ahmad-logo"><i class="fa-solid fa-bolt"></i></div>
+      <h2 class="pair-ahmad-title">JUNAID-MD_³⁰²</h2>
+      <p class="pair-ahmad-subtitle">Generate Your Pairing Code</p>
+      <div class="pair-server-card">
+        <div class="pair-server-icon"><i class="fa-solid fa-server"></i></div>
+        <div class="pair-server-info">
+          <div class="pair-card-heading">Select Server</div>
+          <div class="pair-server-meta"><span class="pair-live-dot"></span><span>Active: <b id="pairActive">--</b></span><span class="pair-limit-icon"><i class="fa-solid fa-users"></i></span><span>Limit: <b>--/50</b></span></div>
+        </div>
+        <div class="pair-select-wrap"><select id="pairServerSelect" onchange="selectServerFromDropdown(this.value)"><option value="1">Select</option></select></div>
+      </div>
+      <div class="pair-quick-card">
+        <div class="pair-quick-icon"><i class="fa-solid fa-circle-info"></i></div>
+        <div><div class="pair-card-heading">Quick Setup</div><p>Select a server, enter your WhatsApp number to instantly generate a pairing code. No deployment needed!</p></div>
+      </div>
+      <div class="pair-ahmad-form">
+        <label for="pairPhone">WhatsApp Number</label>
+        <div class="pair-input-wrap"><i class="fa-solid fa-phone"></i><input type="tel" id="pairPhone" inputmode="numeric" autocomplete="tel" value="923252352321" placeholder=""></div>
+        <div class="pair-country-hint"><i class="fa-solid fa-lightbulb"></i> Include country code (e.g., 92 for Pakistan)</div>
+      </div>
+      <div class="flash" id="pairFlash"></div>
+      <button class="pair-generate-btn" id="pairActionBtn" onclick="doPair()"><i class="fa-solid fa-key"></i> Generate Pair Code</button>
+      <div class="pair-code-card" id="codeBox"><div class="pair-code-placeholder" id="codePlaceholder">Your pairing code will appear here</div><div class="pair-code-value" id="codeDigits">----</div><button class="pair-copy-btn" onclick="copyToClipboard(document.getElementById('codeDigits').textContent)"><i class="fa-regular fa-copy"></i> Copy Code</button></div>
+      <div class="pair-code-card" id="qrBox" style="display:none;text-align:center"><div class="pair-code-placeholder">Scan this QR code with WhatsApp</div><img id="qrImg" src="" alt="WhatsApp QR code" style="width:220px;height:220px;background:#fff;border-radius:14px;padding:8px;margin:10px auto;display:block"><div class="pair-country-hint" id="qrExpireNote">QR refreshes automatically until scanned.</div></div>
+      <div class="pair-footer">© 2026 <span>JUNAID-MD_³⁰²</span> | Powered By JunaidTech</div>
+    </div>
+  </div>
+  </div>
+
+<!-- ================= PAGE USER (Deploy Key Dashboard) ================= -->
+<div class="page" id="page-user">
+  <div id="userGate" style="min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:24px">
+    <div class="card" style="max-width:460px;width:100%;padding:32px">
+      <div style="text-align:center;margin-bottom:20px">🤖 ACCESS YOUR BOT</div>
+      <div class="field"><label>Deploy Key</label><input type="password" id="deployKeyInput" placeholder="Your secret deploy key..."></div>
+      <div class="flash" id="userGateFlash"></div>
+      <button class="btn btn-fire btn-full" onclick="loadUserDashboard()">Open My Dashboard →</button>
+      <button class="btn btn-ghost btn-full" style="margin-top:8px" onclick="showPage('home')">← Back to Home</button>
+    </div>
+  </div>
+  <div id="userShell" style="display:none;padding:24px 24px 60px">
+    <div class="g2" style="margin-bottom:20px">
+      <div class="card"><h3 style="margin-bottom:12px">📊 Bot Status</h3>
+        <div><span class="badge" id="userConnBadge">—</span> <span id="userPhone">—</span></div>
+        <div style="margin-top:8px"><span class="badge b-on" id="userPairsBadge">0 pairs</span></div>
+        <div style="margin-top:12px"><strong>Deploy ID:</strong> <span class="mono" id="userDeployId">—</span></div>
+        <div><strong>Platform:</strong> <span id="userPlatform">—</span></div>
+        <div><strong>Created:</strong> <span id="userCreated">—</span></div>
+      </div>
+      <div class="card"><h3 style="margin-bottom:12px">⚙️ Settings</h3>
+        <div class="field"><label>Bot Name</label><input type="text" id="userBotName"></div>
+        <div class="field"><label>Owner Name</label><input type="text" id="userOwnerName"></div>
+        <div class="field"><label>Prefix</label><input type="text" id="userPrefix" maxlength="3"></div>
+        <div class="field"><label>Mode</label><select id="userMode"><option>public</option><option>private</option></select></div>
+        <div class="flash" id="userSettingsFlash"></div>
+        <button class="btn btn-neon btn-full" onclick="saveUserSettings()">Save Settings</button>
+        <button class="btn btn-ghost btn-full" style="margin-top:8px" onclick="userLogoutSession()">Logout My Bot</button>
+      </div>
+    </div>
+    <div class="card"><h3>🔑 Your Deploy Key</h3><p style="margin-bottom:8px">Keep this private. Use it to access this dashboard.</p>
+      <div class="mono" style="background:rgba(0,0,0,.3);padding:10px;border-radius:8px;text-align:center;cursor:pointer" id="userKeyDisplay" onclick="copyToClipboard(this.innerText)">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= PAGE ADMIN (Full Working) ================= -->
+<div class="page" id="page-admin">
+  <div id="adminGate" style="min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:24px">
+    <div class="card" style="max-width:400px;width:100%">
+      <div style="text-align:center;margin-bottom:20px">🛡️ ADMIN PANEL</div>
+      <div class="field"><label>Username</label><input type="text" id="adminUser" placeholder="Username"></div>
+      <div class="field"><label>Password</label><input type="password" id="adminPass" placeholder="Password"></div>
+      <div class="flash" id="adminLoginFlash"></div>
+      <button class="btn btn-fire btn-full" onclick="adminLogin()">LOGIN</button>
+    </div>
+  </div>
+  <div id="adminShell" style="display:none;padding:24px 24px 60px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap">
+      <h2 style="font-family:var(--ff-head)">Admin Dashboard</h2>
+      <button class="btn btn-ghost btn-sm" onclick="adminLogout()">Logout</button>
+    </div>
+    <div class="stat-grid" id="adminStatsGrid">
+      <div class="stat-card"><div class="stat-val" id="statDeploys">0</div><div class="stat-lbl">Deploys</div></div>
+      <div class="stat-card"><div class="stat-val" id="statPairs">0</div><div class="stat-lbl">Pairs</div></div>
+      <div class="stat-card"><div class="stat-val" id="statUsers">0</div><div class="stat-lbl">Users</div></div>
+      <div class="stat-card"><div class="stat-val" id="statUptime">0s</div><div class="stat-lbl">Uptime</div></div>
+    </div>
+    <div class="g2" style="margin-bottom:24px">
+      <div class="card"><h3>🤖 Bot Info</h3><div id="botInfo">Loading...</div></div>
+      <div class="card"><h3>⚡ Quick Actions</h3>
+        <button class="btn btn-neon btn-full" onclick="reloadPlugins()">Reload Plugins</button>
+        <button class="btn btn-ghost btn-full" style="margin-top:8px" onclick="forceRestart()">Restart Bot</button>
+        <button class="btn btn-red btn-full" style="margin-top:8px" onclick="forceLogoutAll()">Force Logout All</button>
+      </div>
+    </div>
+    <div class="card"><h3>📋 All Deploys</h3><div class="flash" id="adminDeploysFlash"></div>
+      <div class="tbl-wrap"><table id="deploysTable"><thead><tr><th>Deploy ID</th><th>Phone</th><th>Pairs</th><th>Platform</th><th>Last Seen</th><th>Actions</th> </thead><tbody><tr><td colspan="6" style="text-align:center">Loading...</td></tr></tbody></table></div>
+    </div>
+    <div class="card" style="margin-top:20px"><h3>🌐 Servers</h3><div class="flash" id="serverFlash"></div>
+      <div class="g2" style="margin-bottom:16px"><div class="field"><label>Name</label><input id="srvName" placeholder="Heroku EU"></div><div class="field"><label>URL</label><input id="srvUrl" placeholder="https://app.heroku.com/..."></div><div class="field"><label>Platform</label><input id="srvPlatform" placeholder="Heroku"></div><div class="field"><label>Status</label><select id="srvStatus"><option>online</option><option>maintenance</option><option>offline</option></select></div></div>
+      <button class="btn btn-neon btn-full" onclick="addAdminServer()">Add Server</button>
+      <div id="serversList" style="margin-top:20px"></div>
+    </div>
+    <div class="card" style="margin-top:20px"><h3>🔐 Change Admin Credentials</h3><div class="flash" id="credFlash"></div>
+      <div class="g2"><div class="field"><label>Current Password</label><input type="password" id="curPass"></div><div class="field"><label>New Username</label><input type="text" id="newUser"></div><div class="field"><label>New Password</label><input type="password" id="newPass"></div></div>
+      <button class="btn btn-fire" onclick="updateAdminCreds()">Update Credentials</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const socket = io(); let currentDeployKey = ''; let adminToken = localStorage.getItem('at') || null; let deployIdGlobal = '';
+
+// helper
+function flash(id, msg, type, dur=4000) { let el=document.getElementById(id); if(!el) return; el.className=`flash f-${type} show`; el.innerHTML=msg; if(dur) setTimeout(()=>el.classList.remove('show'),dur); }
+function copyToClipboard(txt) { navigator.clipboard?.writeText(txt); toast('Copied!','ok'); }
+function toast(msg,type) { const t=document.createElement('div'); t.className=`flash f-${type}`; t.style.position='fixed'; t.style.bottom='20px'; t.style.left='50%'; t.style.transform='translateX(-50%)'; t.style.zIndex='9999'; t.innerHTML=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2500); }
+function showPage(name) { document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(`page-${name}`).classList.add('active'); if(name==='user' && currentDeployKey) loadUserDashboard(); if(name==='admin' && adminToken) loadAdminData(); }
+function toggleDrawer() { document.getElementById('burgerBtn').classList.toggle('open'); document.getElementById('drawer').classList.toggle('open'); }
+
+// ========== PAIR ==========
+let pairMode = 'code';
+let qrPollTimer = null;
+let selectedServer = 1;
+
+function renderServers() { const sel=document.getElementById('pairServerSelect'); if(!sel) return; sel.innerHTML=Array.from({length:50},(_,i)=>`<option value="${i+1}">Server ${i+1}</option>`).join(''); sel.value=String(selectedServer); }
+function selectServer(n) { selectedServer=Number(n)||1; renderServers(); }
+function selectServerFromDropdown(n) { selectedServer=Number(n)||1; }
+renderServers();
+
+function setPairMode(mode) {
+  pairMode = mode;
+  const codeTab=document.getElementById('tabCodeBtn'), qrTab=document.getElementById('tabQrBtn'); if(codeTab) codeTab.className=mode==='code'?'btn btn-neon':'btn btn-ghost'; if(qrTab) qrTab.className=mode==='qr'?'btn btn-neon':'btn btn-ghost'; const action=document.getElementById('pairActionBtn'); if(action) action.innerHTML=mode==='code'?'<i class="fa-solid fa-key"></i> Generate Pair Code':'<i class="fa-solid fa-qrcode"></i> Generate QR Code';
+  document.getElementById('codeBox').classList.remove('show');
+  document.getElementById('qrBox').style.display = 'none';
+  if (qrPollTimer) { clearInterval(qrPollTimer); qrPollTimer = null; }
+}
+
+async function doPair() {
+  if (pairMode === 'qr') return doPairQr();
+  const num = document.getElementById('pairPhone').value.replace(/\D/g,'');
+  if(num.length<7) { flash('pairFlash','❌ Enter valid number with country code','err'); return; }
+  flash('pairFlash','<span class="spin"></span> Generating...','info',0);
+  try{
+    const res = await fetch('/api/pair',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({number:num, server:selectedServer})});
+    const d = await res.json();
+    if(!res.ok) throw new Error(d.error||'Pair failed');
+    const code = d.pairingCode||'----';
+    document.getElementById('codeDigits').textContent = code.match(/.{1,4}/g)?.join('-') || code;
+    document.getElementById('codeBox').classList.add('show'); document.getElementById('codePlaceholder').style.display='none'; document.getElementById('codeDigits').style.display='block'; document.querySelector('.pair-copy-btn').style.display='inline-flex';
+    if(d.deployId) { document.getElementById('deployIdVal').textContent = d.deployId; document.getElementById('deployReveal').style.display='block'; deployIdGlobal=d.deployId; }
+    flash('pairFlash','✅ Code ready! Enter in WhatsApp → Linked Devices','ok');
+  } catch(e){ flash('pairFlash','❌ '+e.message,'err'); }
+}
+
+async function doPairQr() {
+  const num = document.getElementById('pairPhone').value.replace(/\D/g,'');
+  if(num.length<7) { flash('pairFlash','❌ Enter valid number with country code','err'); return; }
+  flash('pairFlash','<span class="spin"></span> Generating QR...','info',0);
+  try{
+    const res = await fetch('/api/qr',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({number:num, server:selectedServer})});
+    const d = await res.json();
+    if(!res.ok) throw new Error(d.error||'QR generation failed');
+    document.getElementById('qrImg').src = d.qr;
+    document.getElementById('qrBox').style.display = 'block';
+    flash('pairFlash','✅ Scan the QR in WhatsApp → Linked Devices','ok');
+    // Keep polling for a fresh frame every few seconds — Baileys rotates the
+    // QR ~every 20s until it's scanned, and the socket.io 'qr' event below
+    // also updates it live for clients that stay connected.
+    if (qrPollTimer) clearInterval(qrPollTimer);
+    qrPollTimer = setInterval(async () => {
+      try {
+        const r = await fetch(`/api/qr/${num}`);
+        const dd = await r.json();
+        if (dd?.connected) { clearInterval(qrPollTimer); qrPollTimer=null; flash('pairFlash','✅ Paired successfully!','ok'); return; }
+        if (dd?.qr) document.getElementById('qrImg').src = dd.qr;
+      } catch {}
+    }, 4000);
+  } catch(e){ flash('pairFlash','❌ '+e.message,'err'); }
+}
+
+// Live QR push over socket.io (faster than the 4s poll above).
+socket.on('qr', (d) => {
+  const num = document.getElementById('pairPhone')?.value.replace(/\D/g,'');
+  if (pairMode === 'qr' && d?.qr && (!num || d.number === num)) {
+    document.getElementById('qrImg').src = d.qr;
+    document.getElementById('qrBox').style.display = 'block';
+  }
+});
+
+// ========== USER DASHBOARD (Deploy Key) ==========
+async function loadUserDashboard() {
+  const key = document.getElementById('deployKeyInput').value.trim();
+  if(!key) { flash('userGateFlash','❌ Enter your deploy key','err'); return; }
+  try{
+    const res = await fetch('/api/user/info',{method:'POST',headers:{'Content-Type':'application/json','x-deploy-key':key},body:JSON.stringify({deployKey:key})});
+    const d = await res.json();
+    if(!res.ok) throw new Error(d.error||'Invalid key');
+    currentDeployKey = key;
+    document.getElementById('userGate').style.display='none';
+    document.getElementById('userShell').style.display='block';
+    document.getElementById('userConnBadge').innerHTML = d.connected ? '<span class="badge b-on">🟢 Online</span>' : '<span class="badge b-off">🔴 Offline</span>';
+    document.getElementById('userPhone').innerHTML = d.numbers?.length ? `+${d.numbers[0]}` : '—';
+    document.getElementById('userPairsBadge').innerHTML = `${d.pairCount||0} pairs`;
+    document.getElementById('userDeployId').innerText = d.deployId||'—';
+    document.getElementById('userPlatform').innerText = d.platform||'—';
+    document.getElementById('userCreated').innerText = d.createdAt ? new Date(d.createdAt).toLocaleString() : '—';
+    document.getElementById('userBotName').value = d.botName||'';
+    document.getElementById('userOwnerName').value = d.ownerName||'';
+    document.getElementById('userPrefix').value = d.prefix||'.';
+    document.getElementById('userMode').value = d.mode||'public';
+    document.getElementById('userKeyDisplay').innerText = key;
+  } catch(e){ flash('userGateFlash','❌ '+e.message,'err'); }
+}
+async function saveUserSettings() {
+  if(!currentDeployKey) return;
+  try{
+    const res = await fetch('/api/user/update',{method:'POST',headers:{'Content-Type':'application/json','x-deploy-key':currentDeployKey},body:JSON.stringify({
+      deployKey:currentDeployKey,
+      botName:document.getElementById('userBotName').value,
+      ownerName:document.getElementById('userOwnerName').value,
+      prefix:document.getElementById('userPrefix').value,
+      mode:document.getElementById('userMode').value,
+    })});
+    const d = await res.json();
+    if(!res.ok) throw new Error(d.error);
+    flash('userSettingsFlash','✅ Settings saved','ok');
+  } catch(e){ flash('userSettingsFlash','❌ '+e.message,'err'); }
+}
+async function userLogoutSession() {
+  if(!confirm('Logout and delete session?')) return;
+  try{
+    await fetch('/api/user/logout',{method:'POST',headers:{'Content-Type':'application/json','x-deploy-key':currentDeployKey},body:JSON.stringify({deployKey:currentDeployKey})});
+    toast('Logged out','ok');
+    document.getElementById('userGate').style.display='flex';
+    document.getElementById('userShell').style.display='none';
+    currentDeployKey='';
+  } catch(e){ toast('Logout failed','err'); }
+}
+
+// ========== ADMIN ==========
+async function adminLogin() {
+  const u = document.getElementById('adminUser').value.trim();
+  const p = document.getElementById('adminPass').value;
+  if(!u||!p) { flash('adminLoginFlash','❌ Enter credentials','err'); return; }
+  try{
+    const res = await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+    const d = await res.json();
+    if(!res.ok) throw new Error(d.error||'Invalid credentials');
+    adminToken = d.token; localStorage.setItem('at',adminToken);
+    document.getElementById('adminGate').style.display='none';
+    document.getElementById('adminShell').style.display='block';
+    loadAdminData();
+  } catch(e){ flash('adminLoginFlash','❌ '+e.message,'err'); }
+}
+function adminLogout() { adminToken=null; localStorage.removeItem('at'); document.getElementById('adminGate').style.display='flex'; document.getElementById('adminShell').style.display='none'; showPage('home'); }
+async function loadAdminData() {
+  if(!adminToken) return;
+  try{
+    const ov = await fetch('/api/admin/overview',{headers:{'x-admin-token':adminToken}});
+    const stats = await ov.json();
+    document.getElementById('statDeploys').innerText = stats.stats?.totalDeploys||0;
+    document.getElementById('statPairs').innerText = stats.stats?.totalPairs||0;
+    document.getElementById('statUsers').innerText = stats.stats?.totalUsers||0;
+    const up = stats.stats?.uptime||0; let uptxt = up<60?up+'s': up<3600?Math.floor(up/60)+'m': Math.floor(up/3600)+'h';
+    document.getElementById('statUptime').innerText = uptxt;
+    document.getElementById('botInfo').innerHTML = `<div>Bot: ${stats.botName||'REDXBOT'}</div><div>Mode: ${stats.mode||'public'}</div><div>Deploy ID: ${stats.deployId||'—'}</div>`;
+    // deploys table
+    const deploysRes = await fetch('/api/admin/deploys',{headers:{'x-admin-token':adminToken}});
+    const deploys = await deploysRes.json();
+    const tbody = document.querySelector('#deploysTable tbody');
+    if(!deploys.deploys?.length) tbody.innerHTML='<tr><td colspan="6" style="text-align:center">No deploys</td></tr>';
+    else tbody.innerHTML = deploys.deploys.map(d=>`<tr><td class="mono">${d.id}</td><td>${d.phone||'—'}</td><td>${d.pairCount||0}</td><td>${d.platform||'—'}</td><td>${d.lastSeen?new Date(d.lastSeen).toLocaleString():'—'}</td><td><button class="btn btn-red btn-sm" onclick="deleteDeploy('${d.id}')">Delete</button></td></tr>`).join('');
+    // servers
+    loadServersList();
+  } catch(e){ console.error(e); }
+}
+async function loadServersList() {
+  if(!adminToken) return;
+  try{
+    const res = await fetch('/api/admin/servers',{headers:{'x-admin-token':adminToken}});
+    const d = await res.json();
+    const srvDiv = document.getElementById('serversList');
+    if(!d.servers?.length) { srvDiv.innerHTML='<div style="color:var(--t2)">No servers added.</div>'; return; }
+    srvDiv.innerHTML = d.servers.map(s=>`<div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--b1);padding:8px 0"><span><strong>${s.name}</strong> (${s.platform||'—'}) ${s.url?`<a href="${s.url}" target="_blank" style="color:var(--neon)">link</a>`:''}</span><button class="btn btn-red btn-xs" onclick="deleteServer('${s.id}')">Remove</button></div>`).join('');
+  } catch(e){}
+}
+async function addAdminServer() {
+  if(!adminToken) return;
+  const name=document.getElementById('srvName').value.trim(), url=document.getElementById('srvUrl').value.trim(), platform=document.getElementById('srvPlatform').value.trim(), status=document.getElementById('srvStatus').value;
+  if(!name||!url) { flash('serverFlash','❌ Name & URL required','err'); return; }
+  try{
+    const res = await fetch('/api/admin/servers',{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':adminToken},body:JSON.stringify({name,url,platform,status,region:'Global'})});
+    const d = await res.json();
+    if(d.success) { flash('serverFlash','✅ Server added','ok'); document.getElementById('srvName').value=''; document.getElementById('srvUrl').value=''; loadServersList(); loadAdminData(); }
+    else flash('serverFlash','❌ Failed','err');
+  } catch(e){ flash('serverFlash','❌ Error','err'); }
+}
+async function deleteServer(id) {
+  if(!confirm('Remove server?')) return;
+  await fetch(`/api/admin/servers/${id}`,{method:'DELETE',headers:{'x-admin-token':adminToken}});
+  loadServersList(); loadAdminData();
+}
+async function deleteDeploy(id) {
+  if(!confirm(`Delete deploy ${id}?`)) return;
+  await fetch(`/api/admin/deploys/${id}`,{method:'DELETE',headers:{'x-admin-token':adminToken}});
+  loadAdminData();
+}
+async function reloadPlugins() {
+  if(!adminToken) return;
+  await fetch('/api/reload',{method:'POST',headers:{'x-admin-token':adminToken}});
+  toast('Plugins reloaded','ok');
+}
+async function forceRestart() {
+  if(!confirm('Restart bot process? May take a moment.')) return;
+  await fetch('/api/admin/bot/restart',{method:'POST',headers:{'x-admin-token':adminToken}});
+  toast('Restart triggered','ok');
+}
+async function forceLogoutAll() {
+  if(!confirm('Logout all WhatsApp sessions?')) return;
+  await fetch('/api/admin/bot/logout',{method:'POST',headers:{'x-admin-token':adminToken}});
+  toast('All sessions logged out','ok');
+}
+async function updateAdminCreds() {
+  const cur = document.getElementById('curPass').value;
+  const newUser = document.getElementById('newUser').value.trim();
+  const newPass = document.getElementById('newPass').value;
+  if(!cur) { flash('credFlash','❌ Current password required','err'); return; }
+  try{
+    const res = await fetch('/api/admin/settings/credentials',{method:'POST',headers:{'Content-Type':'application/json','x-admin-token':adminToken},body:JSON.stringify({currentPassword:cur,newUsername:newUser||undefined,newPassword:newPass||undefined})});
+    const d = await res.json();
+    if(!res.ok) throw new Error(d.error);
+    flash('credFlash','✅ Updated. You will be logged out.','ok');
+    setTimeout(()=>adminLogout(),2000);
+  } catch(e){ flash('credFlash','❌ '+e.message,'err'); }
+}
+
+// Socket live status & stats
+socket.on('botStatus', (d) => { if(d.connected) document.getElementById('navStat').innerHTML='Online'; else document.getElementById('navStat').innerHTML='Offline'; });
+socket.on('statsUpdate', (d) => { if(document.getElementById('statUsers')) document.getElementById('statUsers').innerText = d.totalUsers||0; });
+setInterval(async ()=>{ if(adminToken && document.getElementById('page-admin').classList.contains('active')) loadAdminData(); }, 15000);
+setInterval(async ()=>{ try{const r=await fetch('/api/status');const s=await r.json();if(s.connected)document.getElementById('navStat').innerHTML='Online';}catch{}},10000);
+
+function playPairingSound() {
+  const audio = document.getElementById('pairingAudio');
+  if (!audio) return;
+  audio.currentTime = 0;
+  const p = audio.play();
+  if (p && typeof p.catch === 'function') p.catch(() => {});
+}
+
+function openPairingWithSound() {
+  // This runs directly from the user's tap, so mobile browsers allow audio playback.
+  playPairingSound();
+  document.getElementById('pair-section').scrollIntoView({behavior:'smooth'});
+}
+
+// Also start/restart the pairing sound when the pairing controls are used.
+// Mobile browsers require a user gesture; these handlers are all user-triggered.
+document.addEventListener('DOMContentLoaded', () => {
+  const codeTab = document.getElementById('tabCodeBtn');
+  const qrTab = document.getElementById('tabQrBtn');
+  const pairBtn = document.getElementById('pairActionBtn');
+  [codeTab, qrTab, pairBtn].forEach(el => {
+    if (el) el.addEventListener('click', playPairingSound, {passive:true});
+  });
+});
+
+// initial load
+window.onload = ()=>{ if(adminToken) { document.getElementById('adminGate').style.display='none'; document.getElementById('adminShell').style.display='block'; loadAdminData(); } };
+</script>
+</body>
+</html>

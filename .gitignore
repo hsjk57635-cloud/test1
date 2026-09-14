@@ -1,0 +1,9 @@
+node_modules/
+sessions/
+temp/
+*.log
+.env
+data.json
+deploys.json
+deploy_id.txt
+servers.json

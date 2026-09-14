@@ -1,0 +1,29 @@
+{
+  "name": "JUNAID-MD↣³⁰²",
+  "description": "🔥 JUNAID-MD↣³⁰² — WhatsApp Bot. No SESSION_ID needed. Just pair your number.",
+  "logo": "https://i.ibb.co/n8kzCwBx/jawadmd.jpg",
+  "keywords": ["whatsapp", "bot", "baileys", "JUNAID-MD↣³⁰²"],
+  "repository": "https://github.com/AbdulRehman19721986/REDXBOT-MD",
+  "env": {
+    "BOT_NAME":       { "description": "Bot display name",                           "value": "JUNAID-MD↣³⁰²😡🚩☠️",       "required": false },
+    "OWNER_NUMBER":   { "description": "Owner WhatsApp number (no + or spaces)",      "value": "",           "required": true  },
+    "OWNER_NAME":     { "description": "Owner display name",                          "value": "JUNAID-MD↣³⁰²",   "required": false },
+    "PREFIX":         { "description": "Command prefix",                              "value": ".",                      "required": false },
+    "BOT_MODE":       { "description": "public or private",                           "value": "public",                 "required": false },
+    "ADMIN_USERNAME": { "description": "Admin panel username — CHANGE THIS!",         "value": "JUNAID",                   "required": false },
+    "ADMIN_PASSWORD": { "description": "Admin panel password — CHANGE THIS!",         "value": "JUNAID",                   "required": false },
+    "DEPLOY_ID":      { "description": "Custom deploy ID (optional, auto-generated)", "required": false },
+    "APP_URL":        { "description": "Your Heroku app URL for keep-alive ping",     "required": false },
+    "CO_OWNER":       { "description": "Co-owner name",                               "value": "",           "required": false },
+    "CO_OWNER_NUM":   { "description": "Co-owner WhatsApp number",                    "value": "",           "required": false },
+    "MENU_IMAGE":     { "description": "Menu thumbnail image URL",                    "value": "https://i.ibb.co/n8kzCwBx/jawadmd.jpg", "required": false },
+    "AUTO_STATUS_SEEN":  { "description": "Auto view statuses (true/false)",          "value": "true",                   "required": false },
+    "AUTO_STATUS_REACT": { "description": "Auto react to statuses (true/false)",      "value": "true",                   "required": false }
+  },
+  "formation": { "web": { "quantity": 1, "size": "eco" } },
+  "buildpacks": [
+    { "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest.git" },
+    { "url": "heroku/nodejs" }
+  ],
+  "stack": "heroku-22"
+}
